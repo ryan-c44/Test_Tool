@@ -1,6 +1,8 @@
 import React from 'react';
 import '../App.css';
 
+import fs from 'fs';
+
 import makeDict from "../Functions/makeDict";
 import AVL from "../Components/AVL_sort_count";
 import lStorage from "../Functions/localStorage";
@@ -8,13 +10,16 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Main = () => {
    
+
+    //Declare global variables for result checking later on
     var avlArray = new Array(10);
     var dictArray = new Array(10);
-
     var sc = 0;
     var uc = 0;
 
-    let countChars = () => {
+    let dictRun = () => {
+
+        //Get document elements to render content to
         let dictTxtArea = document.getElementById("txtArea2"),
             cCounter2 = document.getElementById('cCounter2'),
             wCounter2 = document.getElementById('wCounter2'),
@@ -22,7 +27,8 @@ const Main = () => {
 
 
         let txt = dictTxtArea.value
-        //lStorage.set(AVLTxtArea, txt);
+        
+        // Set up regex 
         // see: http://www.mediacollege.com/internet/javascript/text/count-words.html
         let val = txt
                     .replace(/(^\s*)|(\s*$)/gi,'') // exclude start and end white-space
@@ -30,12 +36,16 @@ const Main = () => {
                     .replace(/[ ]{2,}/gi,' ') // 2 or more space to 1
                     .replace(/[.,!?/]{1,}/gi,' ') // remove special chars
 
-        let wordList = val.split(' '); 
+        let wordList = val.split(' '); // split the value in the text area by spaces
 
-        cCounter2.innerHTML = val.length
+        // collect data for character count and word count
+        cCounter2.innerHTML = val.length 
         wCounter2.innerHTML = val.length !== 0 ? wordList.length : 0;
   
+        // Create fragment for rendering the list of words that are ranked
         let frag = document.createDocumentFragment()
+
+        // Create array of words using makeDict function 
         let dict = makeDict(wordList)
 
         for(var i = 0; i < 10; i++) {
@@ -48,12 +58,14 @@ const Main = () => {
             li.appendChild(span)
             frag.appendChild(li)
 
+            //Add all words and counts to the dictArray for comparison
             dictArray[i] = {
                 val: dict[i].val,
                 count: dict[i].count
             }
         }
 
+        //Append the list elements to the ul
         wordListUL.innerHTML = '';
         wordListUL.appendChild(frag);
 
@@ -63,15 +75,18 @@ const Main = () => {
         let avlTxt = document.getElementById("txtArea1");
         let dictTxt = document.getElementById("txtArea2");
         let numWords = parseInt(document.getElementById("words").value);
+        
+        //Using a react library 'react-words' to generate words
         var randomWords = require('random-words');
-       
-        var words = randomWords({exactly: numWords, join:' '});
-
+        var words = randomWords({exactly: numWords, join:' '}); //join the words by space
+ 
+        //set the textarea values to the words that were generated
         avlTxt.value = words;
         dictTxt.value = words;
 
+        //Running both algorithms and logging their performance to console
         console.time("countChars");
-        countChars();
+        dictRun();
         console.timeEnd("countChars");
 
         console.time("avlRun");
@@ -83,17 +98,20 @@ const Main = () => {
     }
 
     var runTests = () => {
+
+        // Get input from the user for amount of tests to run
         let amountTests = parseInt(document.getElementById('numTest').value);
         let testsRun = document.getElementById('testsRun');
         var timesRun = 0;
 
+        // Run test using an interval of 1.5 seconds between test cases
         var interval = setInterval(function() {
 
             generateText();
 
             timesRun+=1;
             testsRun.innerHTML = " " + timesRun;
-            if(timesRun == amountTests) { clearInterval(interval); }
+            if(timesRun == amountTests) { clearInterval(interval); } //stop tests once it reaches the amount of tests required to run
                 
 
         }, 1500);
@@ -101,13 +119,16 @@ const Main = () => {
     }
 
     var avlRun = () => {
+        //Create AVL object
         var tree = new AVL();
 
+        //Get document elements to render content to
         let AVLTxtArea = document.getElementById("txtArea1");
         let wordlistUL2 = document.getElementById('wordList1');
         let cCounter2 = document.getElementById('cCounter'),
             wCounter2 = document.getElementById('wCounter');
 
+        //Setup regex
         let txt = AVLTxtArea.value
         let val = txt
                     .replace(/(^\s*)|(\s*$)/gi,'') // exclude start and end white-space
@@ -120,6 +141,7 @@ const Main = () => {
         cCounter2.innerHTML = val.length
         wCounter2.innerHTML = val.length !== 0 ? wordList.length : 0;
 
+        //Run the avl functions
         tree.treeins(wordList);
         tree.inorderRec(tree.root);
         tree.mergesort(tree.nodes, 0, tree.node_count - 1);
@@ -136,6 +158,7 @@ const Main = () => {
             li.appendChild(span)
             frag.appendChild(li)
 
+            //add nodes to the avl array for comparing 
             avlArray[i] = {
                 val: tree.nodes[i].key,
                 count: tree.nodes[i].count
@@ -148,28 +171,33 @@ const Main = () => {
     }
 
     var compareArrays = () => {
+
+        //get document elements for rendering successful and unsuccessful counts to
         var successCount = document.getElementById("successful");
         var unsuccessCount = document.getElementById("unsuccessful");
 
         var sCount = 0;
 
+        //Compare each list of words and their rankings; if all 10 are equal then the test is successful.
         for(var i = 0; i < 10; i++) {
             if((avlArray[i].val == dictArray[i].val) && (dictArray[i].count == avlArray[i].count)) {
                 sCount += 1;
             }
         }
 
-
+        //If all 10 words in the list matched with each other we increment the successful test count
         if(sCount == 10) {
             sc += 1;
             successCount.innerHTML = sc;
-        } else {
+        } else { // if not all 10 matched then we increment unsuccessful count.
             uc += 1;
             unsuccessCount.innerHTML = uc;
         }
 
     }
+
     
+    //return the html
     return (
         <div>
             <div>

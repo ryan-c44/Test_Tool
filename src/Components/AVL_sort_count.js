@@ -43,7 +43,7 @@ var AVL = /** @class */ (function () {
         if (root != null) {
 
             this.inorderRec(root.left);
-            this.nodes[this.node_count] = root; //add the nodes to the array of structs
+            this.nodes[this.node_count] = root; //add the nodes to the array of Nodes
             this.node_count++;
             this.inorderRec(root.right);
         }
