@@ -97,6 +97,7 @@ const Main = () => {
                 
 
         }, 1500);
+
     }
 
     var avlRun = () => {
@@ -130,8 +131,8 @@ const Main = () => {
             let span = document.createElement('span')
             li.className = 'list-group-item';
             span.className = 'badge'
-            span.appendChild(document.createTextNode(tree.nodes[i].key))
-            li.appendChild(document.createTextNode(tree.nodes[i].count))
+            span.appendChild(document.createTextNode(tree.nodes[i].count))
+            li.appendChild(document.createTextNode(tree.nodes[i].key))
             li.appendChild(span)
             frag.appendChild(li)
 
@@ -168,8 +169,6 @@ const Main = () => {
         }
 
     }
-
-
     
     return (
         <div>
