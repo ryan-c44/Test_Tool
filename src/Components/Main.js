@@ -3,6 +3,8 @@ import '../App.css';
 
 import fs from 'fs';
 
+import generateWords from "../Functions/generateWords";
+import oracle from "../Functions/oracle";
 import makeDict from "../Functions/makeDict";
 import AVL from "../Components/AVL_sort_count";
 import lStorage from "../Functions/localStorage";
@@ -75,10 +77,8 @@ const Main = () => {
         let avlTxt = document.getElementById("txtArea1");
         let dictTxt = document.getElementById("txtArea2");
         let numWords = parseInt(document.getElementById("words").value);
-        
-        //Using a react library 'react-words' to generate words
-        var randomWords = require('random-words');
-        var words = randomWords({exactly: numWords, join:' '}); //join the words by space
+
+        let words = generateWords(numWords);
  
         //set the textarea values to the words that were generated
         avlTxt.value = words;
@@ -172,26 +172,24 @@ const Main = () => {
 
     var compareArrays = () => {
 
-        //get document elements for rendering successful and unsuccessful counts to
+        // get document elements for rendering successful and unsuccessful counts to
         var successCount = document.getElementById("successful");
         var unsuccessCount = document.getElementById("unsuccessful");
 
-        var sCount = 0;
+        var arraysEqual = oracle(avlArray, dictArray);
 
-        //Compare each list of words and their rankings; if all 10 are equal then the test is successful.
-        for(var i = 0; i < 10; i++) {
-            if((avlArray[i].val == dictArray[i].val) && (dictArray[i].count == avlArray[i].count)) {
-                sCount += 1;
+        
+        if (arraysEqual != 0) {
+            // If oracle returns true
+            if(arraysEqual) {
+                sc += 1;
+                successCount.innerHTML = " " + sc;
+            } else { // if oracle returns false
+                uc += 1;
+                unsuccessCount.innerHTML = " " + uc;
             }
-        }
-
-        //If all 10 words in the list matched with each other we increment the successful test count
-        if(sCount == 10) {
-            sc += 1;
-            successCount.innerHTML = sc;
-        } else { // if not all 10 matched then we increment unsuccessful count.
-            uc += 1;
-            unsuccessCount.innerHTML = uc;
+        } else {
+            console.error("Oracle received wrong inputs");
         }
 
     }
@@ -217,7 +215,7 @@ const Main = () => {
                         <span id="testsRun"> 0</span> 
                     </span>
                     <span>
-                        Successful: 
+                        Successful:
                         <span id="successful"> 0</span> 
                     </span>
                     <span>
